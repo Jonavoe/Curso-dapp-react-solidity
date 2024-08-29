@@ -6,6 +6,10 @@ const secretKey = process.env.SECRET_KEY;
 const address = process.env.ADDRESS;
 
 module.exports = {
+  plugins: ['truffle-plugin-verify'],
+  api_keys: {
+    bscscan: "VNBC4UVTXZS3PI13F6V13GFVRB234WR4BN",
+  },
   contracts_build_directory: path.join(__dirname, "client/src/contracts"),
   networks: {
     development: {
