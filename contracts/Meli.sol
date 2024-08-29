@@ -61,12 +61,46 @@ contract Meli {
     string memory desc,
     string memory section,
     uint price
-  ) {
-    // transferTokens(address(this), __amount(price));
+  ) public {
+    transferTokens(address(this), __amount(__percentValue(price)), msg.sender);
+
     products.push(
       Product(name, desc, section, __amount(price), msg.sender, noOne)
     );
     emit ProductAdded(msg.sender, name, __amount(price));
+  }
+
+  function transferTokens(address _owner, uint _price, address _buyer) private {
+    require(
+      _price <= token.balanceOf(_buyer),
+      "Insuficient tokens to make transfer"
+    );
+    require(
+      token.allowance(_buyer, address(this)) >= _price,
+      "Insuficient allowence to make reserve"
+    );
+
+    bool sent = token.transferFrom(_buyer, _owner, _price);
+    require(sent, "Not sent");
+  }
+
+  function updateProductPrice(uint product_id, uint price) public {
+    require(msg.sender != noOne);
+    Product storage product = products[product_id];
+    require(msg.sender == product.owner);
+    require(product.reserved_by == noOne);
+    product.price = __amount(price);
+  }
+
+  function updateUserContact(string memory contact, string memory name) public {
+    require(msg.sender != noOne);
+    User storage user = users[msg.sender];
+    user.contact = contact;
+    user.name = name;
+
+    if (!user.updated) _totalUsers++;
+
+    user.updated = true;
   }
 
   modifier isOwner() {
