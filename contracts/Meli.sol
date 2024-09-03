@@ -14,7 +14,7 @@ contract Meli {
     string contact;
     bool updated;
     uint total_product;
-    uint[] prducts;
+    uint[] products;
   }
 
   struct Product {
@@ -101,6 +101,39 @@ contract Meli {
     if (!user.updated) _totalUsers++;
 
     user.updated = true;
+  }
+
+  function buyProduct(uint product_id) public {
+    Product storage product = products[product_id];
+    require(msg.sender != product.owner, "You cannot buy your own products");
+    transferTokens(product.owner, product.price, msg.sender);
+    User storage buyer = users[msg.sender];
+    buyer.total_product += 1;
+    buyer.products.push(product_id);
+    product.reserved_by = msg.sender;
+
+    emit ProductPurchased(msg.sender, product.owner, product.price);
+  }
+
+  function totalUsers() public view returns (uint) {
+    return _totalUsers;
+  }
+
+  function getProduct(uint product_id) public view returns (Product memory) {
+    return products[product_id];
+  }
+
+  function getUser(address userAddress) public view returns (User memory) {
+    return users[userAddress];
+  }
+
+  function withdrawBNB(address payable account) external isOwner {
+    (bool success, ) = account.call{ value: address(this).balance }("");
+    require(success);
+  }
+
+  function withdraw(address to, uint256 amount) external isOwner {
+    require(token.transfer(to, amount));
   }
 
   modifier isOwner() {
