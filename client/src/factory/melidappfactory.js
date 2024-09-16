@@ -59,6 +59,22 @@ export default class MeliDappFactory {
     return await this.contract.updateUserContact(contact, name, { from });
   }
 
+  async _updateProductPrice(product_id, price, from) {
+    return await this.contract.updateProductPrice(product_id, price, { from });
+  }
+
+  async _addProduct(name, desc, section, price, from) {
+    return await this.contract.addProduct(name, desc, section, price, { from });
+  }
+
+  async _percentValue(amount, from) {
+    return await this.contract.__percentValue(amount, { from });
+  }
+
+  async _setSecureAddPercent(percent, from) {
+    return await this.contract.setSecureAddPercent(percent, { from });
+  }
+
   mapProducts(products) {
     return products.map((product, product_id) => {
       return {
